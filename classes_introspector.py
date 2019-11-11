@@ -1,3 +1,9 @@
+"""
+Pass an instance of any class to instance() function.
+Returns recursevely all subclasses and superclasses.
+"""
+
+
 def inspector(instance):
     print("Instance attributes:")
 
