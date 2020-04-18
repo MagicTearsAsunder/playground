@@ -18,10 +18,9 @@ def method_decorator(method, cache):
     return new_method
 
 
-def cache(cache_name):
-    cache_name = cache_name or "CACHE"
-
+def cache(cache_name="CACHE"):
     def class_decorator(cls):
+        nonlocal cache_name
         setattr(cls, cache_name, {})
         cache = getattr(cls, cache_name)
         for method_name in cls.__dict__:
@@ -33,7 +32,7 @@ def cache(cache_name):
     return class_decorator
 
 
-@cache(cache_name="MY_CACHE_NAME")
+@cache(cache_name="MY_NAME")
 class Counter:
     def __init__(self, value):
         self.value = value
