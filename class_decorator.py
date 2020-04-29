@@ -2,16 +2,19 @@ import time
 from functools import wraps
 
 
-def decorated(method):
-    method._decorated = True
-    return method
+def decorated(max_cache=3):
+    def new_method(method):
+        nonlocal max_cache
+        method.max_cache = max_cache
+        return method
+    return new_method
 
 
 def method_decorator(method, cache):
     @wraps(method)
     def new_method(self):
         if self.value not in cache[method.__name__]:
-            if len(cache[method.__name__]) > 3:
+            if len(cache[method.__name__]) > method.max_cache:
                 cache[method.__name__].pop(next(iter(cache[method.__name__])))
             cache[method.__name__][self.value] = method(self)
         return cache[method.__name__][self.value]
@@ -25,7 +28,7 @@ def cache(cache_name="CACHE"):
         cache = getattr(cls, cache_name)
         for method_name in cls.__dict__:
             method = getattr(cls, method_name)
-            if hasattr(method, '_decorated'):
+            if hasattr(method, 'max_cache'):
                 cache[method_name] = {}
                 setattr(cls, method_name, method_decorator(method, cache))
         return cls
@@ -37,7 +40,7 @@ class Counter:
     def __init__(self, value):
         self.value = value
 
-    @decorated
+    @decorated(max_cache=4)
     def sqr(self):
         print("Calculating..")
         time.sleep(1)
